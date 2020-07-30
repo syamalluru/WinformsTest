@@ -22,61 +22,21 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void OnCheckClicked(object sender, EventArgs e)
         {
             Console.WriteLine("Clicked");
-            label1.Text = "pre check";
-            //RunspaceConfiguration runspaceConfiguration = RunspaceConfiguration.Create();
-
-            //Runspace runspace = RunspaceFactory.CreateRunspace(runspaceConfiguration);
-            //runspace.Open();
-
-            //Pipeline pipeline = runspace.CreatePipeline();
-            //string scriptfile = File.ReadAllText(@"dotcheck.ps1");
-            ////Here's how you add a new script with arguments
-            //Command myCommand = new Command(scriptfile);
-            //CommandParameter testParam = new CommandParameter("key", "value");
-            //myCommand.Parameters.Add(testParam);
-
-            //pipeline.Commands.Add(myCommand);
-
-            //// Execute PowerShell script
-            //var results = pipeline.Invoke();
-
-
-            //ProcessStartInfo startInfo = new ProcessStartInfo();
-            //startInfo.FileName = @"dotcheck.ps1";
-            //startInfo.RedirectStandardOutput = true;
-            //startInfo.RedirectStandardError = true;
-            //startInfo.UseShellExecute = false;
-            //startInfo.CreateNoWindow = true;
-            //Process process = new Process();
-            //process.StartInfo = startInfo;
-            //process.Start();
-
-            //string output = process.StandardOutput.ReadToEnd();
-
+            MessageLabel.Text = "Checking ....";
             string scriptfile = File.ReadAllText(@"dotcheck.ps1");
             RunspaceConfiguration config = RunspaceConfiguration.Create();
-            PSSnapInException psEx;
-            //add Microsoft SharePoint PowerShell SnapIn
-            //create powershell runspace
             Runspace cmdlet = RunspaceFactory.CreateRunspace(config);
             cmdlet.Open();
-            RunspaceInvoke scriptInvoker = new RunspaceInvoke(cmdlet);
-            // set powershell execution policy to unrestricted
-            //scriptInvoker.Invoke("Set-ExecutionPolicy Unrestricted");
-            // create a pipeline and load it with command object
             Pipeline pipeline = cmdlet.CreatePipeline();
             try
             {
-                // Using Get-SPFarm powershell command 
                 pipeline.Commands.AddScript(scriptfile);
-                // this will format the output
                 Collection<PSObject> output = pipeline.Invoke();
                 pipeline.Stop();
                 cmdlet.Close();
-                // process each object in the output and append to stringbuilder  
                 StringBuilder results = new StringBuilder();
                 foreach (PSObject obj in output)
                 {
@@ -84,22 +44,17 @@ namespace WindowsFormsApp1
                 }
                 if (results.ToString().Contains("Success"))
                 {
-                    label1.Text = "Success";
+                    MessageLabel.Text = "Success";
                 }
                 else
                 {
-                    label1.Text = "Failed";
+                    MessageLabel.Text = "Failed";
                 }
             }
             catch (Exception ex)
             {
-                label1.Text = "Exception";
+                MessageLabel.Text = ex.Message;
             }
-            //foreach (var  i in results)
-            //{
-
-            //}
-            //runspace.Close();
         }
 
     }
